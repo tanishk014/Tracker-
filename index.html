@@ -1,679 +1,570 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Employee Management System</title>
-
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;background:#f3f6fb;color:#253247}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-.app{display:flex;min-height:100vh}
-.sidebar{width:230px;background:#172941;color:white;padding:25px 15px;flex-shrink:0}
-.logo{font-size:22px;font-weight:bold;margin-bottom:35px}
-.logo span{color:#72a2ff}
-.sidebar button{display:block;width:100%;text-align:left;background:none;border:0;color:#c5d0df;padding:13px;border-radius:8px;margin-bottom:7px}
-.sidebar button:hover,.sidebar button.active{background:#304766;color:white}
-.main{flex:1;padding:25px;min-width:0}
-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:25px;flex-wrap:wrap}
-h1{font-size:25px}
-h2{font-size:20px;margin-bottom:8px}
-p{color:#8290a3;font-size:13px}
-.btn{border:0;padding:11px 15px;border-radius:7px;font-weight:bold}
-.primary{background:#376bd4;color:white}
-.secondary{background:#e9eff9;color:#365b9c}
-.danger{background:#ffe9e9;color:#c43e4b}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
-.card,.panel{background:white;border-radius:12px;padding:18px;box-shadow:0 3px 14px #1729410b}
-.card small{color:#8190a3}
-.card h2{font-size:27px;margin-top:12px;color:#253b59}
-.section{display:none}
-.section.active{display:block}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-.panel{margin-bottom:16px}
-.panel h3{margin-bottom:15px}
-table{width:100%;border-collapse:collapse;min-width:650px}
-th,td{text-align:left;padding:12px;border-bottom:1px solid #edf0f5;font-size:12px}
-th{background:#f7f9fc;color:#64748b}
-.table-wrap{overflow-x:auto}
-select,input,textarea{padding:10px;border:1px solid #dce3ec;border-radius:6px;width:100%;background:white}
-label{display:block;font-size:12px;font-weight:bold;margin:12px 0 5px}
-.status{font-weight:bold;border-radius:5px;padding:6px;font-size:11px}
-.Present{background:#dff5e9;color:#168454}
-.Absent{background:#ffe5e5;color:#c23e48}
-.WOFF{background:#e9edf3;color:#526174}
-.COMOFF{background:#e3edff;color:#315fbd}
-.WFH{background:#ddf5fa;color:#187c92}
-.Paid-Leave{background:#eee5ff;color:#754bc2}
-.Unpaid-Leave{background:#ffebd9;color:#bb671c}
-.Half-Day{background:#fff2d0;color:#96721a}
-.Holiday-Paid{background:#ffe5ef;color:#b54b75}
-.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:18px 0}
-.toolbar h2{margin-right:auto}
-.modal{display:none;position:fixed;inset:0;background:#101c2d99;z-index:10;align-items:center;justify-content:center;padding:15px}
+:root{--primary:#2563eb;--bg:#f4f6fb;--text:#1e293b;--muted:#64748b;--border:#e2e8f0}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:#fff;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+header h2{margin:0;font-size:21px}
+nav{display:flex;gap:8px;flex-wrap:wrap}
+button,select,input{font:inherit}
+button{border:0;border-radius:8px;padding:10px 14px;cursor:pointer;background:#e8eefc;color:#1e40af}
+button:hover{filter:brightness(.96)}
+button.primary{background:var(--primary);color:white}
+button.danger{background:#fee2e2;color:#b91c1c}
+button.active{background:var(--primary);color:white}
+main{max-width:1200px;margin:24px auto;padding:0 16px}
+.page{display:none}
+.page.active{display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:18px 0}
+.card,.panel{background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px}
+.card small{color:var(--muted)}
+.card h2{margin:10px 0 0;font-size:27px}
+.panel{margin:16px 0;overflow-x:auto}
+.panel h3{margin-top:0}
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0}
+.toolbar input,.toolbar select,.form-grid input,.form-grid select{padding:10px;border:1px solid var(--border);border-radius:8px;background:white;min-width:0}
+.month-label{font-weight:bold;min-width:140px;text-align:center}
+table{border-collapse:collapse;width:100%;min-width:700px}
+th,td{padding:11px 10px;text-align:left;border-bottom:1px solid var(--border);font-size:14px}
+th{background:#f8fafc;color:#475569}
+td select{padding:7px;border:1px solid var(--border);border-radius:6px;max-width:150px}
+.status{font-weight:bold;color:#334155}
+.muted{color:var(--muted)}
+.badge{display:inline-block;padding:4px 8px;border-radius:20px;background:#eef2ff;color:#3730a3;font-size:12px}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:10;align-items:center;justify-content:center;padding:15px}
 .modal.show{display:flex}
-.modal-content{background:white;padding:25px;border-radius:13px;width:100%;max-width:650px;max-height:90vh;overflow:auto}
-.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
-.close{border:0;background:#eee;border-radius:6px;padding:7px 12px;font-size:18px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
-.balance{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:15px}
-.balance div{background:#f5f7fb;padding:15px;border-radius:8px;flex:1;min-width:120px}
-.balance strong{display:block;font-size:22px;margin-top:8px}
-.hidden{display:none}
-.badge{background:#e7f5ec;color:#178552;padding:5px 9px;border-radius:15px;font-size:11px}
-#message{position:fixed;bottom:20px;right:20px;background:#172941;color:white;padding:13px 18px;border-radius:8px;display:none;z-index:30}
-@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:650px){
-.app{display:block}
-.sidebar{width:100%;padding:12px}
-.logo{margin:0 0 10px}
-.sidebar nav{display:flex;overflow-x:auto;gap:5px}
-.sidebar button{white-space:nowrap;width:auto;padding:10px;margin:0}
-.main{padding:15px}
-.two{grid-template-columns:1fr}
-.form-grid{grid-template-columns:1fr}
-.grid{gap:9px}
-.card{padding:12px}
-.card h2{font-size:22px}
-h1{font-size:21px}
+.modal-box{background:white;border-radius:14px;padding:22px;width:min(520px,100%);max-height:90vh;overflow:auto}
+.modal-box h2{margin-top:0}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:#475569}
+.form-grid input,.form-grid select{width:100%}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.summary-line{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)}
+.total{font-size:20px;font-weight:bold}
+.empty{text-align:center;padding:25px;color:var(--muted)}
+@media(max-width:600px){
+ header{padding:14px}
+ main{margin:15px auto}
+ .form-grid{grid-template-columns:1fr}
+ .toolbar>*{flex:1}
+ .month-label{min-width:100px}
 }
 </style>
 </head>
-
 <body>
-<div class="app">
-
-<aside class="sidebar">
-<div class="logo">People<span>Desk</span></div>
-<nav>
-<button class="active" onclick="showSection('dashboard',this)">▦ Dashboard</button>
-<button onclick="showSection('attendance',this)">▤ Attendance</button>
-<button onclick="openSalary()">₹ Salary Details</button>
-<button onclick="showSection('employee',this)">♙ Employee Details</button>
-<button onclick="showSection('history',this)">◷ Leave & COMOFF History</button>
-</nav>
-</aside>
-
-<main class="main">
 
 <header>
-<div>
-<h1 id="pageTitle">Dashboard</h1>
-<p>Employee Attendance & Employment Management</p>
-</div>
-<button class="btn primary" onclick="openAttendance()">+ Add Daily Attendance</button>
+  <h2>Employee Management</h2>
+  <nav>
+    <button class="nav-btn active" data-page="dashboard">Dashboard</button>
+    <button class="nav-btn" data-page="attendance">Attendance</button>
+    <button class="nav-btn" data-page="employees">Employees</button>
+    <button class="nav-btn" data-page="history">History</button>
+  </nav>
 </header>
 
-<!-- DASHBOARD -->
-<section id="dashboard" class="section active">
+<main>
+  <section id="dashboard" class="page active">
+    <h2>Dashboard</h2>
+    <div class="cards">
+      <div class="card"><small>Total Employees</small><h2 id="totalEmployees">1</h2></div>
+      <div class="card"><small>Present Today</small><h2 id="presentToday">0</h2></div>
+      <div class="card"><small>Absent Today</small><h2 id="absentToday">0</h2></div>
+      <div class="card"><small>Paid Leaves Used This Month</small><h2 id="leavesUsed">0</h2></div>
+    </div>
+    <div class="panel">
+      <h3>Quick Actions</h3>
+      <div class="toolbar">
+        <button class="primary" data-page="attendance">Mark Attendance</button>
+        <button data-page="employees">Manage Employee</button>
+        <button data-action="salary">View Salary</button>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Employee Overview</h3>
+      <div id="dashboardEmployee"></div>
+    </div>
+  </section>
 
-<div class="grid">
-<div class="card"><small>Paid Leaves Available</small><h2 id="dAvailable">2</h2></div>
-<div class="card"><small>Paid Leaves Taken</small><h2 id="dTaken">0</h2></div>
-<div class="card"><small>Paid Leaves Pending</small><h2>0</h2></div>
-<div class="card"><small>COMOFF Earned</small><h2 id="dEarned">0</h2></div>
-<div class="card"><small>COMOFF Taken</small><h2 id="dComTaken">0</h2></div>
-<div class="card"><small>COMOFF Available</small><h2 id="dComAvailable">0</h2></div>
-<div class="card"><small>Total Present Days</small><h2 id="dPresent">0</h2></div>
-<div class="card"><small>Total Absent Days</small><h2 id="dAbsent">0</h2></div>
-</div>
+  <section id="attendance" class="page">
+    <h2>Attendance Management</h2>
+    <div class="toolbar">
+      <button data-action="prev-month">← Previous</button>
+      <span class="month-label" id="attendanceMonth"></span>
+      <button data-action="next-month">Next →</button>
+      <button class="primary" data-action="salary">Calculate Salary</button>
+    </div>
+    <div class="panel">
+      <div id="attendanceTable"></div>
+    </div>
+  </section>
 
-<div class="two">
-<div class="panel">
-<h3>Employee Overview</h3>
-<h2 id="dashName">Employee Name</h2>
-<p id="dashId">EMP-001</p><br>
-<p>Joining Date: <strong id="dashDoj"></strong></p><br>
-<p>Employment Duration: <strong id="duration"></strong></p><br>
-<p>Monthly Salary: ₹15,000</p>
-</div>
+  <section id="employees" class="page">
+    <h2>Employee Details</h2>
+    <div class="toolbar">
+      <button class="primary" data-action="edit-employee">Edit Employee Details</button>
+    </div>
+    <div class="panel" id="employeeDetails"></div>
+  </section>
 
-<div class="panel">
-<h3>Attendance Summary</h3>
-<p id="dashMonth"></p><br>
-<div id="dashSummary"></div>
-</div>
-</div>
-</section>
-
-<!-- ATTENDANCE -->
-<section id="attendance" class="section">
-<div class="toolbar">
-<button class="btn secondary" onclick="changeMonth(-1)">← Previous</button>
-<h2 id="monthTitle"></h2>
-<button class="btn secondary" onclick="changeMonth(1)">Next →</button>
-<button class="btn primary" onclick="currentMonth()">Go to Current Month</button>
-</div>
-
-<div class="panel">
-<div class="table-wrap">
-<table>
-<thead>
-<tr><th>Date</th><th>Day</th><th>Status</th><th>Remarks</th><th>Action</th></tr>
-</thead>
-<tbody id="attendanceTable"></tbody>
-</table>
-</div>
-</div>
-<div class="panel">
-<h3>Monthly Attendance Summary</h3>
-<div id="monthSummary"></div>
-</div>
-</section>
-
-<!-- EMPLOYEE -->
-<section id="employee" class="section">
-<div class="panel">
-<div class="toolbar">
-<h2>Employee Employment Details</h2>
-<button class="btn primary" onclick="editEmployee()">Edit Details</button>
-</div>
-<div id="employeeDetails"></div>
-</div>
-</section>
-
-<!-- HISTORY -->
-<section id="history" class="section">
-<div class="panel">
-<h2>Leave & COMOFF History</h2><br>
-<div class="table-wrap">
-<table>
-<thead>
-<tr><th>Date</th><th>Transaction</th><th>Earned/Taken</th><th>Quantity</th><th>Balance</th><th>Remarks</th></tr>
-</thead>
-<tbody id="historyTable"></tbody>
-</table>
-</div>
-</div>
-</section>
-
+  <section id="history" class="page">
+    <h2>Attendance History</h2>
+    <div class="toolbar">
+      <button data-action="prev-month">← Previous</button>
+      <span class="month-label" id="historyMonth"></span>
+      <button data-action="next-month">Next →</button>
+    </div>
+    <div class="panel" id="historyTable"></div>
+  </section>
 </main>
-</div>
 
-<!-- ATTENDANCE MODAL -->
-<div class="modal" id="attendanceModal">
-<div class="modal-content">
-<div class="modal-header">
-<h2 id="attendanceTitle">Add Attendance</h2>
-<button class="close" onclick="closeModal('attendanceModal')">×</button>
-</div>
-
-<form id="attendanceForm">
-<input type="hidden" id="oldDate">
-
-<label>Attendance Date</label>
-<input type="date" id="attDate" required>
-
-<label>Day</label>
-<input id="attDay" readonly>
-
-<label>Attendance Status</label>
-<select id="attStatus" required>
-<option value="">Select Status</option>
-<option>Present</option>
-<option>Absent</option>
-<option>WOFF</option>
-<option>COMOFF</option>
-<option>WFH</option>
-<option>Paid Leave</option>
-<option>Unpaid Leave</option>
-<option>Half Day</option>
-<option>Holiday (Paid)</option>
-</select>
-
-<label>Remarks</label>
-<textarea id="attRemarks" rows="3"></textarea>
-
-<p id="attWarning" style="color:#c43e4b;margin-top:10px"></p>
-
-<div class="actions">
-<button type="button" class="btn secondary" onclick="closeModal('attendanceModal')">Cancel</button>
-<button class="btn primary">Save Attendance</button>
-</div>
-</form>
-</div>
-</div>
-
-<!-- EMPLOYEE MODAL -->
+<!-- Employee modal -->
 <div class="modal" id="employeeModal">
-<div class="modal-content">
-<div class="modal-header">
-<h2>Edit Employee</h2>
-<button class="close" onclick="closeModal('employeeModal')">×</button>
+  <div class="modal-box">
+    <h2>Employee Details</h2>
+    <div class="form-grid">
+      <label>Employee Name<input id="formName" type="text"></label>
+      <label>Employee ID<input id="formId" type="text"></label>
+      <label>Date of Joining<input id="formDoj" type="date"></label>
+      <label>Monthly Salary (₹)<input id="formSalary" type="number" min="0"></label>
+      <label>Department<input id="formDepartment" type="text"></label>
+      <label>Designation<input id="formDesignation" type="text"></label>
+      <label>Contact Number<input id="formContact" type="tel"></label>
+      <label>Status
+        <select id="formStatus">
+          <option>Active</option><option>Inactive</option>
+        </select>
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button data-action="close-employee">Cancel</button>
+      <button class="primary" data-action="save-employee">Save Details</button>
+    </div>
+  </div>
 </div>
 
-<form id="employeeForm">
-<label>Employee Name</label>
-<input id="empName" required>
-
-<div class="form-grid">
-<div><label>Employee ID</label><input id="empId" required></div>
-<div><label>Date of Joining</label><input type="date" id="empDoj" required></div>
-<div><label>Monthly Salary</label><input type="number" id="empSalary" required></div>
-<div><label>Status</label>
-<select id="empStatus"><option>Active</option><option>On Notice</option><option>Inactive</option></select>
-</div>
-<div><label>Department</label><input id="empDepartment"></div>
-<div><label>Designation</label><input id="empDesignation"></div>
-</div>
-
-<label>Contact Details</label>
-<input id="empContact">
-
-<div class="actions">
-<button type="button" class="btn secondary" onclick="closeModal('employeeModal')">Cancel</button>
-<button class="btn primary">Save Details</button>
-</div>
-</form>
-</div>
-</div>
-
-<!-- SALARY MODAL: hidden until clicked -->
+<!-- Salary modal -->
 <div class="modal" id="salaryModal">
-<div class="modal-content" style="max-width:900px">
-<div class="modal-header">
-<div><h2>Salary Details</h2><p>Confidential payroll information</p></div>
-<button class="close" onclick="closeModal('salaryModal')">×</button>
+  <div class="modal-box">
+    <h2>Monthly Salary Details</h2>
+    <div class="toolbar">
+      <button data-action="prev-month">←</button>
+      <span class="month-label" id="salaryMonth"></span>
+      <button data-action="next-month">→</button>
+    </div>
+    <div id="salaryDetails"></div>
+    <div class="modal-actions">
+      <button data-action="close-salary">Close</button>
+    </div>
+  </div>
 </div>
-
-<label>Select Month</label>
-<select id="salaryMonth" onchange="renderSalary()"></select>
-
-<div class="balance">
-<div><small>Monthly Fixed Salary</small><strong id="sFixed">₹15,000</strong></div>
-<div><small>Gross Salary</small><strong id="sGross">₹15,000</strong></div>
-<div><small>Salary Deduction</small><strong id="sDeduction">₹0</strong></div>
-<div><small>Net Payable</small><strong id="sNet">₹15,000</strong></div>
-</div>
-
-<div class="table-wrap">
-<table>
-<thead><tr><th>Salary Component</th><th>Days</th><th>Amount</th></tr></thead>
-<tbody id="salaryComponents"></tbody>
-</table>
-</div>
-
-<h3 style="margin-top:20px">Monthly Salary History</h3>
-<div class="table-wrap">
-<table>
-<thead><tr><th>Month</th><th>Fixed Salary</th><th>Paid Days</th><th>Deduction</th><th>Net Salary</th></tr></thead>
-<tbody id="salaryHistory"></tbody>
-</table>
-</div>
-</div>
-</div>
-
-<div id="message"></div>
 
 <script>
-// =====================================
-// CONFIGURATION
-// =====================================
+"use strict";
 
-const STORAGE = "employee_management_system_v1";
+/* -------------------- DATA -------------------- */
 
-const STATUSES = [
-"Present","Absent","WOFF","COMOFF","WFH",
-"Paid Leave","Unpaid Leave","Half Day","Holiday (Paid)"
+const DEFAULT_EMPLOYEE = {
+  name: "Employee Name",
+  id: "EMP001",
+  doj: "2026-08-05",
+  salary: 15000,
+  department: "General",
+  designation: "Employee",
+  contact: "",
+  status: "Active"
+};
+
+let employee = load("employee", DEFAULT_EMPLOYEE);
+let attendance = load("attendance", {});
+let holidays = load("holidays", []);
+let currentMonth = new Date();
+currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+
+/* -------------------- STORAGE -------------------- */
+
+function load(key, fallback) {
+  try {
+    const value = localStorage.getItem("employeeSystem_" + key);
+    return value ? JSON.parse(value) : structuredClone(fallback);
+  } catch (error) {
+    return structuredClone(fallback);
+  }
+}
+
+function save(key, value) {
+  localStorage.setItem("employeeSystem_" + key, JSON.stringify(value));
+}
+
+function saveAll() {
+  save("employee", employee);
+  save("attendance", attendance);
+  save("holidays", holidays);
+}
+
+/* -------------------- DATE HELPERS -------------------- */
+
+function dateKey(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function parseDate(key) {
+  const [y, m, d] = key.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function monthKey(date = currentMonth) {
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}`;
+}
+
+function monthName(date = currentMonth) {
+  return date.toLocaleString("en-IN", {month:"long",year:"numeric"});
+}
+
+function daysInMonth(date = currentMonth) {
+  return new Date(date.getFullYear(), date.getMonth()+1, 0).getDate();
+}
+
+function isWeeklyOff(date) {
+  if (date.getDay() === 0) return true;
+  if (date.getDay() === 6) {
+    const saturdayNumber = Math.ceil(date.getDate() / 7);
+    return [1, 3, 5].includes(saturdayNumber);
+  }
+  return false;
+}
+
+function isHoliday(key) {
+  return holidays.includes(key);
+}
+
+function isOffDay(date) {
+  return isWeeklyOff(date) || isHoliday(dateKey(date));
+}
+
+function isAfterJoining(key) {
+  return key >= employee.doj;
+}
+
+function getRecord(key) {
+  return attendance[key] || (isOffDay(parseDate(key)) ? "WOFF" : "");
+}
+
+/* -------------------- NAVIGATION -------------------- */
+
+function showPage(page) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+
+  const target = document.getElementById(page);
+  if (target) target.classList.add("active");
+
+  document.querySelectorAll(`[data-page="${page}"]`).forEach(b => b.classList.add("active"));
+
+  renderAll();
+}
+
+/* -------------------- ATTENDANCE -------------------- */
+
+const attendanceOptions = [
+  ["", "Select Status"],
+  ["P", "Present"],
+  ["A", "Absent"],
+  ["HD", "Half Day"],
+  ["PL", "Paid Leave"],
+  ["UL", "Unpaid Leave"],
+  ["WFH", "Work From Home"],
+  ["COMOFF", "Comp Off"]
 ];
 
-// Add declared holiday dates here.
-const HOLIDAYS = [
-"2026-08-15",
-"2026-10-02"
-];
+function renderAttendance() {
+  document.getElementById("attendanceMonth").textContent = monthName();
 
-const DEFAULT_DATA = {
-employee:{
-name:"Employee Name",
-id:"EMP-001",
-doj:"2026-08-05",
-salary:15000,
-status:"Active",
-department:"Operations",
-designation:"Employee",
-contact:""
-},
-attendance:{}
-};
+  let html = `<table>
+    <thead><tr><th>Date</th><th>Day</th><th>Attendance Status</th></tr></thead><tbody>`;
 
-let data = loadData();
-let selectedMonth = monthKey(today());
+  const total = daysInMonth();
 
-// =====================================
-// STORAGE
-// =====================================
+  for (let day = 1; day <= total; day++) {
+    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    const key = dateKey(date);
 
-function loadData(){
-try{
-const saved=JSON.parse(localStorage.getItem(STORAGE));
-if(saved && saved.employee && saved.attendance){
-return {
-employee:{...DEFAULT_DATA.employee,...saved.employee},
-attendance:saved.attendance
-};
-}
-}catch(e){}
-return JSON.parse(JSON.stringify(DEFAULT_DATA));
-}
+    if (!isAfterJoining(key)) continue;
 
-function saveData(){
-localStorage.setItem(STORAGE,JSON.stringify(data));
+    const off = isOffDay(date);
+    const savedStatus = attendance[key] || (off ? "WOFF" : "");
+    const locked = off && !attendance[key];
+
+    html += `<tr>
+      <td>${date.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</td>
+      <td>${date.toLocaleDateString("en-IN",{weekday:"long"})}</td>
+      <td>`;
+
+    if (locked) {
+      html += `<span class="badge">${isHoliday(key) ? "HOLIDAY" : "WEEKLY OFF"}</span>`;
+    } else {
+      html += `<select class="attendance-select" data-date="${key}">
+        ${attendanceOptions.map(([value,label]) =>
+          `<option value="${value}" ${savedStatus===value?"selected":""}>${label}</option>`
+        ).join("")}
+        <option value="WOFF" ${savedStatus==="WOFF"?"selected":""}>Weekly Off</option>
+      </select>`;
+    }
+
+    html += `</td></tr>`;
+  }
+
+  html += "</tbody></table>";
+  document.getElementById("attendanceTable").innerHTML = html;
 }
 
-// =====================================
-// DATE UTILITIES
-// =====================================
+function updateAttendance(key, status) {
+  const date = parseDate(key);
 
-function localISO(d){
-return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  if (!isAfterJoining(key)) {
+    alert("Attendance cannot be marked before the joining date.");
+    return;
+  }
+
+  if (status === "COMOFF" && isOffDay(date)) {
+    alert("Comp Off can only be used on a working day.");
+    renderAll();
+    return;
+  }
+
+  if (status === "PL") {
+    const used = paidLeavesUsed(monthKey(date));
+    if (used >= 2 && attendance[key] !== "PL") {
+      alert("You have already used 2 paid leaves this month.");
+      renderAll();
+      return;
+    }
+  }
+
+  if (status === "WOFF" && !isOffDay(date)) {
+    alert("Weekly Off can only be marked on an eligible weekly off or holiday.");
+    renderAll();
+    return;
+  }
+
+  if (status === "") delete attendance[key];
+  else attendance[key] = status;
+
+  save("attendance", attendance);
+  renderAll();
 }
 
-function today(){
-return localISO(new Date());
+function paidLeavesUsed(month) {
+  return Object.entries(attendance).filter(([key, value]) =>
+    key.startsWith(month) && value === "PL"
+  ).length;
 }
 
-function parseDate(s){
-const [y,m,d]=s.split("-").map(Number);
-return new Date(y,m-1,d);
+/* -------------------- COMPOFF -------------------- */
+
+function compOffBalance() {
+  let balance = 0;
+  const keys = Object.keys(attendance).sort();
+
+  keys.forEach(key => {
+    const status = attendance[key];
+    const date = parseDate(key);
+
+    if (isOffDay(date) && ["P","WFH"].includes(status)) balance++;
+    if (!isOffDay(date) && status === "COMOFF") balance--;
+  });
+
+  return Math.max(0, balance);
 }
 
-function addDays(s,n){
-const d=parseDate(s);
-d.setDate(d.getDate()+n);
-return localISO(d);
+/* -------------------- SALARY -------------------- */
+
+function calculateSalary(date = currentMonth) {
+  const totalDays = daysInMonth(date);
+  const first = new Date(date.getFullYear(), date.getMonth(), 1);
+  const last = new Date(date.getFullYear(), date.getMonth()+1, 0);
+
+  const joining = parseDate(employee.doj);
+  const eligibleStart = joining > first ? joining : first;
+
+  if (eligibleStart > last) {
+    return {
+      totalDays, eligibleDays:0, base:0, absent:0,
+      half:0, unpaid:0, deductions:0, net:0
+    };
+  }
+
+  let eligibleDays = 0;
+  let absent = 0;
+  let half = 0;
+  let unpaid = 0;
+
+  for (let day = eligibleStart.getDate(); day <= totalDays; day++) {
+    const current = new Date(date.getFullYear(), date.getMonth(), day);
+    const key = dateKey(current);
+    const status = attendance[key] || (isOffDay(current) ? "WOFF" : "");
+
+    eligibleDays++;
+
+    if (status === "A") absent++;
+    if (status === "HD") half++;
+    if (status === "UL") unpaid++;
+  }
+
+  const dailySalary = Number(employee.salary || 0) / totalDays;
+  const base = dailySalary * eligibleDays;
+  const deductions = dailySalary * (absent + unpaid + half * 0.5);
+  const net = Math.max(0, base - deductions);
+
+  return {
+    totalDays, eligibleDays, base, absent, half, unpaid, deductions, net
+  };
 }
 
-function monthKey(s){
-return s.slice(0,7);
+function rupees(value) {
+  return "₹" + Number(value).toLocaleString("en-IN", {
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
+  });
 }
 
-function daysInMonth(key){
-const [y,m]=key.split("-").map(Number);
-return new Date(y,m,0).getDate();
+function renderSalary() {
+  document.getElementById("salaryMonth").textContent = monthName();
+
+  const s = calculateSalary();
+
+  document.getElementById("salaryDetails").innerHTML = `
+    <div class="summary-line"><span>Employee</span><strong>${escapeHTML(employee.name)}</strong></div>
+    <div class="summary-line"><span>Monthly Fixed Salary</span><strong>${rupees(employee.salary)}</strong></div>
+    <div class="summary-line"><span>Calendar Days in Month</span><strong>${s.totalDays}</strong></div>
+    <div class="summary-line"><span>Eligible Days from Joining</span><strong>${s.eligibleDays}</strong></div>
+    <div class="summary-line"><span>Prorated Salary</span><strong>${rupees(s.base)}</strong></div>
+    <div class="summary-line"><span>Absent Days</span><strong>${s.absent}</strong></div>
+    <div class="summary-line"><span>Half Days</span><strong>${s.half}</strong></div>
+    <div class="summary-line"><span>Unpaid Leaves</span><strong>${s.unpaid}</strong></div>
+    <div class="summary-line"><span>Total Deductions</span><strong>${rupees(s.deductions)}</strong></div>
+    <div class="summary-line total"><span>Net Salary</span><strong>${rupees(s.net)}</strong></div>
+    <div class="summary-line"><span>Paid Leaves Used</span><strong>${paidLeavesUsed(monthKey())} / 2</strong></div>
+    <div class="summary-line"><span>Comp Off Balance</span><strong>${compOffBalance()}</strong></div>
+    <p class="muted">Salary is calculated using the actual calendar days in the selected month. Sundays and 1st, 3rd and 5th Saturdays are weekly offs. Declared holidays are also treated as weekly offs.</p>
+  `;
 }
 
-function monthName(key){
-return parseDate(key+"-01").toLocaleDateString("en-IN",{month:"long",year:"numeric"});
+/* -------------------- EMPLOYEE DETAILS -------------------- */
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  }[char]));
 }
 
-function fmt(s){
-return parseDate(s).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+function renderEmployee() {
+  document.getElementById("employeeDetails").innerHTML = `
+    <div class="summary-line"><span>Name</span><strong>${escapeHTML(employee.name)}</strong></div>
+    <div class="summary-line"><span>Employee ID</span><strong>${escapeHTML(employee.id)}</strong></div>
+    <div class="summary-line"><span>Date of Joining</span><strong>${escapeHTML(employee.doj)}</strong></div>
+    <div class="summary-line"><span>Monthly Salary</span><strong>${rupees(employee.salary)}</strong></div>
+    <div class="summary-line"><span>Department</span><strong>${escapeHTML(employee.department)}</strong></div>
+    <div class="summary-line"><span>Designation</span><strong>${escapeHTML(employee.designation)}</strong></div>
+    <div class="summary-line"><span>Contact</span><strong>${escapeHTML(employee.contact)}</strong></div>
+    <div class="summary-line"><span>Employment Status</span><strong>${escapeHTML(employee.status)}</strong></div>
+  `;
 }
 
-function weekday(s){
-return parseDate(s).toLocaleDateString("en-IN",{weekday:"long"});
+function openEmployeeModal() {
+  document.getElementById("formName").value = employee.name;
+  document.getElementById("formId").value = employee.id;
+  document.getElementById("formDoj").value = employee.doj;
+  document.getElementById("formSalary").value = employee.salary;
+  document.getElementById("formDepartment").value = employee.department;
+  document.getElementById("formDesignation").value = employee.designation;
+  document.getElementById("formContact").value = employee.contact;
+  document.getElementById("formStatus").value = employee.status;
+
+  document.getElementById("employeeModal").classList.add("show");
 }
 
-function money(n){
-return new Intl.NumberFormat("en-IN",{
-style:"currency",currency:"INR",maximumFractionDigits:2
-}).format(n);
+function saveEmployee() {
+  const name = document.getElementById("formName").value.trim();
+  const id = document.getElementById("formId").value.trim();
+  const doj = document.getElementById("formDoj").value;
+  const salary = Number(document.getElementById("formSalary").value);
+
+  if (!name || !id || !doj || !Number.isFinite(salary) || salary < 0) {
+    alert("Please enter a valid name, employee ID, joining date and salary.");
+    return;
+  }
+
+  employee = {
+    name,
+    id,
+    doj,
+    salary,
+    department: document.getElementById("formDepartment").value.trim(),
+    designation: document.getElementById("formDesignation").value.trim(),
+    contact: document.getElementById("formContact").value.trim(),
+    status: document.getElementById("formStatus").value
+  };
+
+  save("employee", employee);
+  document.getElementById("employeeModal").classList.remove("show");
+  renderAll();
 }
 
-function clean(n){
-return Math.round(n*100)/100;
+/* -------------------- HISTORY -------------------- */
+
+function renderHistory() {
+  document.getElementById("historyMonth").textContent = monthName();
+
+  const rows = Object.entries(attendance)
+    .filter(([key]) => key.startsWith(monthKey()))
+    .sort(([a],[b]) => a.localeCompare(b));
+
+  if (!rows.length) {
+    document.getElementById("historyTable").innerHTML =
+      '<div class="empty">No attendance records for this month.</div>';
+    return;
+  }
+
+  let html = `<table><thead><tr><th>Date</th><th>Day</th><th>Status</th></tr></thead><tbody>`;
+
+  rows.forEach(([key,status]) => {
+    const date = parseDate(key);
+    const label = attendanceOptions.find(o => o[0] === status)?.[1] || status;
+    html += `<tr>
+      <td>${key}</td>
+      <td>${date.toLocaleDateString("en-IN",{weekday:"long"})}</td>
+      <td>${escapeHTML(label)}</td>
+    </tr>`;
+  });
+
+  html += "</tbody></table>";
+  document.getElementById("historyTable").innerHTML = html;
 }
 
-// =====================================
-// WEEKLY OFF RULES
-// =====================================
+/* -------------------- DASHBOARD -------------------- */
 
-function isSaturdayOff(s){
-const d=parseDate(s);
-return d.getDay()===6 && [1,3,5].includes(Math.ceil(d.getDate()/7));
-}
+function renderDashboard() {
+  const today = dateKey(new Date());
+  const todayStatus = attendance[today] || "";
 
-function isWeeklyOff(s){
-const d=parseDate(s);
-return d.getDay()===0 || isSaturdayOff(s);
-}
+  document.getElementById("totalEmployees").textContent =
+    employee.status === "Active" ? "1" : "0";
 
-function isHoliday(s){
-return HOLIDAYS.includes(s);
-}
+  document.getElementById("presentToday").textContent =
+    ["P","WFH"].includes(todayStatus) ? "1" : "0";
 
-function isEligibleOff(s){
-return isWeeklyOff(s)||isHoliday(s);
-}
+  document.getElementById("absentToday").textContent =
+    todayStatus === "A" ? "1" : "0";
 
-function defaultStatus(s){
-return isWeeklyOff(s)?"WOFF":"";
-}
-
-// =====================================
-// ATTENDANCE DATA
-// =====================================
-
-function getStatus(s){
-return data.attendance[s]?.status || defaultStatus(s);
-}
-
-function datesForMonth(key){
-let start=key+"-01";
-let end=key+"-"+String(daysInMonth(key)).padStart(2,"0");
-
-if(start<data.employee.doj)start=data.employee.doj;
-if(start>end)return [];
-
-let result=[];
-for(let s=start;s<=end;s=addDays(s,1))result.push(s);
-return result;
-}
-
-function count(key,status){
-return datesForMonth(key).filter(s=>getStatus(s)===status).length;
-}
-
-// =====================================
-// PAID LEAVE
-// =====================================
-
-function leaveStats(key){
-const entitlement=datesForMonth(key).length?2:0;
-const taken=count(key,"Paid Leave");
-
-return {
-entitlement,
-taken,
-balance:Math.max(0,entitlement-taken)
-};
-}
-
-// =====================================
-// COMOFF LEDGER
-// =====================================
-
-function comoffLedger(){
-let balance=0,earned=0,used=0,rows=[];
-
-const dates=Object.keys(data.attendance)
-.filter(s=>s>=data.employee.doj)
-.sort();
-
-for(const s of dates){
-const st=data.attendance[s].status;
-const remarks=data.attendance[s].remarks||"";
-
-if(isEligibleOff(s)&&(st==="Present"||st==="WFH")){
-balance++;
-earned++;
-rows.push({
-date:s,type:"COMOFF",action:"Earned",
-qty:1,balance,remarks:remarks||"Worked on weekly off / holiday"
-});
-}
-
-if(st==="COMOFF"){
-if(balance>0){
-balance--;
-used++;
-rows.push({
-date:s,type:"COMOFF",action:"Taken",
-qty:1,balance,remarks:remarks||"COMOFF used"
-});
-}
-}
-}
-
-return {balance,earned,used,rows};
-}
-
-// =====================================
-// NAVIGATION
-// =====================================
-
-function showSection(name,button){
-document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-document.getElementById(name).classList.add("active");
-
-document.querySelectorAll(".sidebar button").forEach(b=>b.classList.remove("active"));
-if(button)button.classList.add("active");
-
-const titles={
-dashboard:"Dashboard",
-attendance:"Attendance Management",
-employee:"Employee Details",
-history:"Leave & COMOFF History"
-};
-
-document.getElementById("pageTitle").textContent=titles[name];
-renderAll();
-}
-
-function openModal(id){
-document.getElementById(id).classList.add("show");
-}
-
-function closeModal(id){
-document.getElementById(id).classList.remove("show");
-}
-
-function notify(message){
-const el=document.getElementById("message");
-el.textContent=message;
-el.style.display="block";
-setTimeout(()=>el.style.display="none",2500);
-}
-
-// =====================================
-// DASHBOARD
-// =====================================
-
-function renderDashboard(){
-const key=monthKey(today());
-const leave=leaveStats(key);
-const com=comoffLedger();
-
-document.getElementById("dAvailable").textContent=leave.balance;
-document.getElementById("dTaken").textContent=leave.taken;
-document.getElementById("dEarned").textContent=com.earned;
-document.getElementById("dComTaken").textContent=com.used;
-document.getElementById("dComAvailable").textContent=com.balance;
-document.getElementById("dPresent").textContent=count(key,"Present");
-document.getElementById("dAbsent").textContent=count(key,"Absent");
-
-document.getElementById("dashName").textContent=data.employee.name;
-document.getElementById("dashId").textContent=data.employee.id;
-document.getElementById("dashDoj").textContent=fmt(data.employee.doj);
-document.getElementById("duration").textContent=duration(data.employee.doj);
-document.getElementById("dashMonth").textContent=monthName(key);
-
-document.getElementById("dashSummary").innerHTML=
-STATUSES.map(s=>`<p style="margin:7px 0">${s}: <strong>${count(key,s)}</strong></p>`).join("");
-}
-
-function duration(doj){
-if(doj>today())return "Not started";
-const a=parseDate(doj),b=parseDate(today());
-let years=b.getFullYear()-a.getFullYear();
-let months=b.getMonth()-a.getMonth();
-let days=b.getDate()-a.getDate();
-if(days<0){months--;days+=new Date(b.getFullYear(),b.getMonth(),0).getDate();}
-if(months<0){years--;months+=12;}
-return `${years} years, ${months} months, ${days} days`;
-}
-
-// =====================================
-// ATTENDANCE CALENDAR
-// =====================================
-
-function renderAttendance(){
-document.getElementById("monthTitle").textContent=monthName(selectedMonth);
-
-const dates=datesForMonth(selectedMonth);
-
-document.getElementById("attendanceTable").innerHTML=dates.map(s=>{
-const r=data.attendance[s]||{status:defaultStatus(s),remarks:""};
-const st=r.status;
-
-return `<tr>
-<td>${fmt(s)} ${s===today()?"⭐":""}</td>
-<td>${weekday(s)}</td>
-<td>
-<select onchange="quickUpdate('${s}',this.value)" class="status ${st.replace(/[^a-z]/gi,'-')}">
-<option value="">Not Marked</option>
-${STATUSES.map(x=>`<option ${st===x?"selected":""}>${x}</option>`).join("")}
-</select>
-</td>
-<td>${escapeHTML(r.remarks||"—")}</td>
-<td>
-<button class="btn secondary" onclick="openAttendance('${s}')">Edit</button>
-${data.attendance[s]?`<button class="btn danger" onclick="deleteAttendance('${s}')">Delete</button>`:""}
-</td>
-</tr>`;
-}).join("");
-
-document.getElementById("monthSummary").innerHTML=
-STATUSES.map(s=>`<span style="display:inline-block;padding:8px;margin:4px;background:#edf2f8;border-radius:6px">${s}: <strong>${count(selectedMonth,s)}</strong></span>`).join("");
-}
-
-function changeMonth(n){
-const d=parseDate(selectedMonth+"-01");
-d.setMonth(d.getMonth()+n);
-selectedMonth=monthKey(localISO(d));
-renderAttendance();
-}
-
-function currentMonth(){
-selectedMonth=monthKey(today());
-renderAttendance();
-}
-
-// =====================================
-// ADD / EDIT ATTENDANCE
-// =====================================
-
-function openAttendance(date=""){
-document.getElementById("attendanceForm").reset();
-document.getElementById("oldDate").value=date;
-
-let chosen=date||today();
-document.getElementById("attDate").value=chosen;
-document.getElementById("attendanceTitle").textContent=date?"Edit Attendance":"Add Attendance";
-
-if(date){
-document.getElementById("attStatus").value=data.attendance[date].status;
-document.getElementById("attRemarks").value=data.attendance[date].remarks||"";
-}else{
-document.getElementById("attStatus").value=defaultStatus(chosen);
-}
-
-updateDay();
-openModal("attendanceModal");
-}
-
-function updateDay(){
-const s=document.getElementById("attDate").value;
-if(!s)return;
-
-document.getElementById("attDay").value=weekday(s);
-
-let message="";
-if(isWeeklyOff(s))message="Weekly off: Present or WFH earns 1 COMOFF.";
-if(isHoliday(s))message="Declared holiday: Present or WFH earns 1 COMOFF.";
-
-document.getElementById("attWarning")
+  document.getElementById("leavesUsed").textContent =
+    paidLeavesUsed(month
